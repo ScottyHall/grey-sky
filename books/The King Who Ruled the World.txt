@@ -1,0 +1,5 @@
+Once upon a time. There was an evil king who ruled the world.
+He didn't have much, even though he ruled the world.
+Who knows why.
+END
+RoomLocation:lastLine

@@ -1,0 +1,10 @@
+First Name:
+Last Name:
+Age:
+Background:
+Gender ('m'/'f':
+Strength (0 - 100):
+Health (0 - 100):
+Infected Status (0 or 1):
+Current Room:
+Inventory (separate with lines):

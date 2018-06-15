@@ -1,3 +1,6 @@
+import os
+
+
 class Person(object):
     """general person building class to set, edit, return attributes
 
@@ -155,6 +158,74 @@ class Room(object):
         self.npcPresent.append(npcToAdd)
 
 
+class Item(object):
+    """general item building class to set, edit, and return attributes
+
+    Attributes:
+    itemName = string
+    itemDamage = 0 - 100
+    itemAbility = hack, attack, heal, cure, buff, nerf
+    itemMaterial = wood, metal, electronic, breakable, meltable
+    itemDescription = string
+    """
+    def __init__(self, name, dmg, ability, material, desc):
+        self.itemName = name
+        self.itemDamage = dmg
+        self.itemAbility = ability
+        self.itemMaterial = material
+        self.itemDescription = desc
+
+    # returns for item
+    def return_itemName(self):
+        return self.itemName
+
+    def return_itemDamage(self):
+        return self.itemDamage
+
+    def return_itemAbility(self):
+        return self.itemAbility
+
+    def return_itemMaterial(self):
+        return self.itemMaterial
+
+    def return_itemDescription(self):
+        return self.itemDescription
+
+    # setters for item
+    def set_itemName(self, name):
+        self.itemName = name
+
+    def set_itemDamage(self, newDmg):
+        self.itemDamage = newDmg
+
+    def set_itemAbility(self, newAbil):
+        self.itemAbility = newAbil
+
+    def set_itemMaterial(self, newMaterial):
+        self.itemMaterial = newMaterial
+
+    def set_itemDescription(self, newDesc):
+        self.itemDescription = newDesc
+
+
+class Book(Item):
+    """general book building class to set and return attributes
+
+    Attributes:
+    bookWriting = list (page number: text)
+    """
+
+    def __init__(self, writing):
+        self.bookWriting = writing
+        print("Book Created")
+
+    def add_bookPage(self, text):
+        self.bookWriting.append(text)
+
+    def return_writing(self, pageNO):
+        return self.bookWriting[pageNO]
+
+
 char1 = Person("Tubby", "Tubbs", 25,
                "this is the bg of Mr. Tubbs", 'm',
                75, 100, 0)
@@ -165,6 +236,128 @@ room1 = Room("Lab", "purple", ["smelly", "damp", "dirty"],
 room2 = Room("Kitchen", "purple", ["smelly", "damp", "dirty"],
              "messy", "none", ["cold", "flooded"],
              ["key", "book", "table"], ["Henry"])
+
+
+# scans for .txt files in given folder to auto-add items, npcs, and books
+def file_scan(folderName):  # "books", "npcs", "items"
+    bookObjects = []  # used for object reference of all books created
+    bookTitles = []  # used for string reference of all books created
+    npcObjects = []
+    npcTitles = []
+    npcBuildList = []
+    npcItemList = []
+    itemObjects = []
+    itemTitles = []
+    roomObjects = []
+    roomTitles = []
+    for file in os.listdir(folderName):
+        if file.endswith(".txt"):
+            fileName = file.split(".")[0]  # ditches the '.txt'
+            # print(os.path.join(folderName, file))
+            joinedFileName = folderName + "/" + file
+            f = open(joinedFileName, "r")
+            # print("This is printing {}".format(joinedFileName))
+            if folderName is "books":
+                bookTitles.append(fileName)  # save file name as string list item
+                bookText = ["Click the next Arrow to turn the page"]
+                file = Book(bookText)
+                bookObjects.append(file)  # save file as object list
+                for line in f:
+                    if "END" in line:  # looks for 'END'
+                        document = f.readlines()
+                        lastLine = document[-1]
+                        lastLine = lastLine.split(":")[1]
+                        bookTitles.append(lastLine)
+                        bookObjects.append("")
+                        break
+                    file.add_bookPage(line)
+                    print(line)
+                f.close()
+            elif folderName is "npcs":
+                npcTitles.append(fileName)  # save file name as string list item
+                npcObjects.append(file)  # save file as object list
+                document = f.readlines()
+                print("Document type")
+                print(type(document))
+                for line in document:
+                    if "First Name" in line:
+                        name = line.split(":")[1]
+                        name = name.rstrip("\n")
+                        npcBuildList.append(name)
+                    if "Last Name" in line:
+                        name = line.split(":")[1]
+                        name = name.rstrip("\n")
+                        npcBuildList.append(name)
+                    if "Age" in line:
+                        age = line.split(":")[1]
+                        age = age.rstrip("\n")
+                        age = int(age)
+                        npcBuildList.append(age)
+                    if "Gender" in line:
+                        gender = line.split(":")[1]
+                        gender = gender.rstrip("\n")
+                        npcBuildList.append(gender)
+                    if "Strength" in line:
+                        strength = line.split(":")[1]
+                        strength = strength.rstrip("\n")
+                        strength = int(strength)
+                        npcBuildList.append(strength)
+                    if "Health" in line:
+                        health = line.split(":")[1]
+                        health = health.rstrip("\n")
+                        health = int(health)
+                        npcBuildList.append(health)
+                    if "Infected" in line:
+                        infected = line.split(":")[1]
+                        infected = infected.rstrip("\n")
+                        infected = int(infected)
+                        npcBuildList.append(infected)
+                    if "Strength" in line:
+                        strength = line.split(":")[1]
+                        strength = strength.rstrip("\n")
+                        strength = int(strength)
+                        npcBuildList.append(strength)
+                    if "Inventory" in line:
+                        itemListLen = len(document)
+                        for i in range(10, itemListLen):
+                            itemToAdd = document[i]
+                            itemToAdd = itemToAdd.rstrip("\n")
+                            itemToAdd = itemToAdd.title()
+                            npcItemList.append(itemToAdd)
+
+                fileName = Person("Tubby", "Tubbs", 25,
+                                  "this is the bg of Mr. Tubbs", 'm',
+                                  75, 100, 0)
+            elif folderName is "items":
+                pass
+            elif folderName is "rooms":
+                pass
+
+    if folderName is "books":
+        # zips the two lists as a dictionary (keys are strings: values are objects)
+        bookObjectLookup = dict(zip(bookTitles, bookObjects))
+        # remember to build the book association to a room
+        return(bookObjectLookup)
+    elif folderName is "npcs":
+        npcObjectLookup = dict(zip(npcTitles, npcObjects))
+        return(npcObjectLookup)
+    elif folderName is "items":
+        itemObjectLookup = dict(zip(itemTitles, itemObjects))
+        return(itemObjectLookup)
+    elif folderName is "rooms":
+        roomObjectLookup = dict(zip(roomTitles, roomObjects))
+        return(roomObjectLookup)
+
+
+books = file_scan("npcs")
+print(books)
+
+""" example of pulling a page from a book.
+First book in object list, 3rd index (2nd line of txt)"""
+# print("Printing the book")
+# print(books["book1"].return_writing(1))
+# print(books["The King Who Ruled the World"].return_writing(3))
+
 
 print(char1.return_first())
 print(char1.return_last())

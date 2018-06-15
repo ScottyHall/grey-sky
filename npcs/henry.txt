@@ -1,0 +1,13 @@
+First Name:Henry
+Last Name:Stevenson
+Age:53
+Background:
+Gender ('m'/'f':m
+Strength (0 - 100):65
+Health (0 - 100):100
+Infected Status (0 or 1):0
+Current Room:cafeteria
+Inventory (separate with lines):
+Spray Bottle
+Microfiber Cloth
+Pencil
