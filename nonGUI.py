@@ -101,6 +101,7 @@ class Room(object):
     roomItems: dictionary
     npcPresent: list (lists NPCs in room)
     """
+
     def __init__(self, roomName, wallColor, uniqueFeatures, floorDescription,
                  roomConnections, roomStatus, roomItems, npcPresent):
         self.roomName = roomName
@@ -131,6 +132,28 @@ class Room(object):
     def return_roomStatus(self):
         return self.roomStatus
 
+    def return_roomItems(self):
+        return self.roomItems
+
+    def return_npcPresent(self):
+        return self.npcPresent
+
+    # setters for room
+    def del_roomItem(self, itemToRm):
+        if itemToRm in self.roomItems:
+            self.roomItems.remove(itemToRm)
+            return True
+        return False
+
+    def remove_npc(self, npcToRm):
+        if npcToRm in self.npcPresent:
+            self.npcPresent.remove(npcToRm)
+            return True
+        return False
+
+    def add_npc(self, npcToAdd):
+        self.npcPresent.append(npcToAdd)
+
 
 char1 = Person("Tubby", "Tubbs", 25,
                "this is the bg of Mr. Tubbs", 'm',
@@ -138,7 +161,10 @@ char1 = Person("Tubby", "Tubbs", 25,
 
 room1 = Room("Lab", "purple", ["smelly", "damp", "dirty"],
              "messy", "none", ["cold", "flooded"],
-             {"key": "unlocks doors", "book": "a book", "table": "it's a table..."}, "Tubby")
+             ["key", "book", "table"], ["Tubby"])
+room2 = Room("Kitchen", "purple", ["smelly", "damp", "dirty"],
+             "messy", "none", ["cold", "flooded"],
+             ["key", "book", "table"], ["Henry"])
 
 print(char1.return_first())
 print(char1.return_last())
@@ -151,10 +177,45 @@ print(char1.return_infected())
 print(char1.return_currentroom())
 
 
+# iterates through room status list
 def room_status(room):
     for i in range(len(room.return_roomStatus())):
         print("{} {}: {}".format(room.roomName, i + 1, room.roomStatus[i]))
 
 
+# iterates through room item keys
+def room_itemKeys(room):
+    for i in range(len(room.return_roomItems())):
+        print("{} item {}: {}".format(room.roomName, i + 1,
+                                      room.return_roomItems()[i]))
+
+
+# removes specified item from specified room if present
+def rm_roomItem(room, itemToRm):
+    if room.del_roomItem(itemToRm) is True:
+        print("Successfully removed '{}', from {}".format(itemToRm, room.roomName))
+    else:
+        print("'{}', is not located in {}".format(itemToRm, room.roomName))
+
+
+# removes NPC from room and changes to new (if needed)
+def npc_changeroom(currentRoom, npc, newRoom):
+    npcName = npc.firstName
+    if currentRoom.remove_npc(npcName) is True:
+        if newRoom is 0:  # specify 0 as new room if no new room
+            print("Successfully removed '{}', from {}.\nNo new room specified".format(npcName, currentRoom.roomName))
+        else:
+            newRoom.add_npc(npc.firstName)
+            print("Successfully removed '{}', from {}.\nChanged to {}".format(npcName, currentRoom.roomName, newRoom.roomName))
+
+
+rm_roomItem(room1, "key")
+
+
 print(room1.return_roomStatus())
-room_status(room1)
+room_itemKeys(room1)
+
+print("\n{}".format(room1.return_npcPresent()))
+npc_changeroom(room1, char1, room2)
+print("\n{}".format(room1.return_npcPresent()))
+print("\n{}".format(room2.return_npcPresent()))
