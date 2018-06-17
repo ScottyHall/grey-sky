@@ -1,0 +1,15 @@
+First Name:Peter
+Last Name:Quincy
+Age:28
+Background:Peter was a funny person.
+Gender ('m'/'f':m
+Strength (0 - 100):65
+Health (0 - 100):100
+Infected Status (0 or 1):0
+Current Room:cafeteria
+Inventory (separate with lines):
+Cloth
+Pencil
+Chair
+POiehfpoaieg
+Testing

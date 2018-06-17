@@ -1,7 +1,7 @@
 First Name:Henry
 Last Name:Stevenson
 Age:53
-Background:
+Background:This is the best background that you could ever ask for. I hope that text wrapping works in the program, because this would be a real bummer otherwise.
 Gender ('m'/'f':m
 Strength (0 - 100):65
 Health (0 - 100):100
