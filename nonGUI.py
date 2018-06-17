@@ -217,7 +217,6 @@ class Book(Item):
 
     def __init__(self, writing):
         self.bookWriting = writing
-        print("Book Created")
 
     def add_bookPage(self, text):
         self.bookWriting.append(text)
@@ -244,8 +243,7 @@ def file_scan(folderName):  # "books", "npcs", "items"
     bookTitles = []  # used for string reference of all books created
     npcObjects = []
     npcTitles = []
-    npcBuildList = []
-    npcItemList = []
+    npcItemList = []  # stores npc inventory list
     itemObjects = []
     itemTitles = []
     roomObjects = []
@@ -271,52 +269,48 @@ def file_scan(folderName):  # "books", "npcs", "items"
                         bookObjects.append("")
                         break
                     file.add_bookPage(line)
-                    print(line)
                 f.close()
             elif folderName is "npcs":
-                npcTitles.append(fileName)  # save file name as string list item
-                npcObjects.append(file)  # save file as object list
+                npcTitles.append(fileName.title())  # save file name as string list item
+                # npcObjects.append(file)  # save file as object list
                 document = f.readlines()
-                print("Document type")
-                print(type(document))
                 for line in document:
                     if "First Name" in line:
                         name = line.split(":")[1]
                         name = name.rstrip("\n")
-                        npcBuildList.append(name)
+                        npcBuildFirstName = name
                     if "Last Name" in line:
                         name = line.split(":")[1]
                         name = name.rstrip("\n")
-                        npcBuildList.append(name)
+                        npcBuildLastName = name
                     if "Age" in line:
                         age = line.split(":")[1]
                         age = age.rstrip("\n")
                         age = int(age)
-                        npcBuildList.append(age)
+                        npcBuildAge = age
+                    if "Background" in line:
+                        bg = line.split(":")[1]
+                        bg = bg.rstrip("\n")
+                        npcBuildBG = bg
                     if "Gender" in line:
                         gender = line.split(":")[1]
                         gender = gender.rstrip("\n")
-                        npcBuildList.append(gender)
+                        npcBuildGender = gender
                     if "Strength" in line:
                         strength = line.split(":")[1]
                         strength = strength.rstrip("\n")
                         strength = int(strength)
-                        npcBuildList.append(strength)
+                        npcBuildStrength = strength
                     if "Health" in line:
                         health = line.split(":")[1]
                         health = health.rstrip("\n")
                         health = int(health)
-                        npcBuildList.append(health)
+                        npcBuildHealth = health
                     if "Infected" in line:
                         infected = line.split(":")[1]
                         infected = infected.rstrip("\n")
                         infected = int(infected)
-                        npcBuildList.append(infected)
-                    if "Strength" in line:
-                        strength = line.split(":")[1]
-                        strength = strength.rstrip("\n")
-                        strength = int(strength)
-                        npcBuildList.append(strength)
+                        npcBuildInfected = infected
                     if "Inventory" in line:
                         itemListLen = len(document)
                         for i in range(10, itemListLen):
@@ -324,12 +318,39 @@ def file_scan(folderName):  # "books", "npcs", "items"
                             itemToAdd = itemToAdd.rstrip("\n")
                             itemToAdd = itemToAdd.title()
                             npcItemList.append(itemToAdd)
+                npcName = Person(npcBuildFirstName, npcBuildLastName,
+                                 npcBuildAge, npcBuildBG, npcBuildGender,
+                                 npcBuildStrength, npcBuildHealth, npcBuildInfected)
+                npcObjects.append(npcName)  # append object to list for zipping
 
-                fileName = Person("Tubby", "Tubbs", 25,
-                                  "this is the bg of Mr. Tubbs", 'm',
-                                  75, 100, 0)
             elif folderName is "items":
-                pass
+                itemTitles.append(fileName.title())  # save file name as string list item
+                document = f.readlines()
+                for line in document:
+                    if "Item Name" in line:
+                        name = line.split(":")[1]
+                        name = name.rstrip("\n")
+                        itemBuildFirstName = name
+                    if "Item Damage" in line:
+                        dmg = line.split(":")[1]
+                        dmg = dmg.rstrip("\n")
+                        dmg = int(dmg)
+                        itemBuildDamage = dmg
+                    if "Item Ability" in line:
+                        ability = line.split(":")[1]
+                        ability = ability.rstrip("\n")
+                        itemBuildAbility = ability
+                    if "Item Material" in line:
+                        material = line.split(":")[1]
+                        material = material.rstrip("\n")
+                        itemBuildMaterial = material
+                    if "Item Description" in line:
+                        description = line.split(":")[1]
+                        description = description.rstrip("\n")
+                        itemBuildDesc = description
+                itemName = Item(itemBuildFirstName, itemBuildDamage,
+                                itemBuildAbility, itemBuildMaterial, itemBuildDesc)
+                itemObjects.append(itemName)  # append object to list for zipping
             elif folderName is "rooms":
                 pass
 
@@ -349,25 +370,25 @@ def file_scan(folderName):  # "books", "npcs", "items"
         return(roomObjectLookup)
 
 
-books = file_scan("npcs")
-print(books)
+""" ITEM example of creating the items
+scanning all files and pulling dic key and damage"""
+# items = file_scan("items")
+# itemDisplay = list(items.keys())
+# print("{} does a total of {} damage!".format(itemDisplay[0], items["Thor'S Hammer"].return_itemDamage()))
 
-""" example of pulling a page from a book.
+
+""" NPC example of creating the npcs
+scanning files and pulling backgrounds"""
+# npcs = file_scan("npcs")
+# print(npcs["Henry"].return_background())
+# print(npcs["Peter"].return_background())
+
+""" BOOK example of pulling a page from a book.
 First book in object list, 3rd index (2nd line of txt)"""
+# books = file_scan("books")
 # print("Printing the book")
 # print(books["book1"].return_writing(1))
 # print(books["The King Who Ruled the World"].return_writing(3))
-
-
-print(char1.return_first())
-print(char1.return_last())
-print(char1.return_age())
-print(char1.return_background())
-print(char1.return_gender())
-print(char1.return_strength())
-print(char1.return_health())
-print(char1.return_infected())
-print(char1.return_currentroom())
 
 
 # iterates through room status list
