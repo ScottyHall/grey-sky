@@ -248,13 +248,16 @@ def file_scan(folderName):  # "books", "npcs", "items"
     itemTitles = []
     roomObjects = []
     roomTitles = []
-    for file in os.listdir(folderName):
+    roomItemList = []
+    roomNpcList = []
+    for file in os.listdir(folderName):  # checks for folder names
         if file.endswith(".txt"):
             fileName = file.split(".")[0]  # ditches the '.txt'
             # print(os.path.join(folderName, file))
             joinedFileName = folderName + "/" + file
             f = open(joinedFileName, "r")
             # print("This is printing {}".format(joinedFileName))
+            # checks for new lines in .txt files located in books/
             if folderName is "books":
                 bookTitles.append(fileName)  # save file name as string list item
                 bookText = ["Click the next Arrow to turn the page"]
@@ -273,6 +276,7 @@ def file_scan(folderName):  # "books", "npcs", "items"
             elif folderName is "npcs":
                 npcTitles.append(fileName.title())  # save file name as string list item
                 # npcObjects.append(file)  # save file as object list
+                document = ""
                 document = f.readlines()
                 for line in document:
                     if "First Name" in line:
@@ -322,6 +326,8 @@ def file_scan(folderName):  # "books", "npcs", "items"
                                  npcBuildAge, npcBuildBG, npcBuildGender,
                                  npcBuildStrength, npcBuildHealth, npcBuildInfected)
                 npcObjects.append(npcName)  # append object to list for zipping
+                document = ""
+                f.close()
 
             elif folderName is "items":
                 itemTitles.append(fileName.title())  # save file name as string list item
@@ -351,8 +357,59 @@ def file_scan(folderName):  # "books", "npcs", "items"
                 itemName = Item(itemBuildFirstName, itemBuildDamage,
                                 itemBuildAbility, itemBuildMaterial, itemBuildDesc)
                 itemObjects.append(itemName)  # append object to list for zipping
+                document = ""
+                f.close()
+
             elif folderName is "rooms":
-                pass
+                roomTitles.append(fileName.title())  # save file name as string list item
+                document = ""
+                document = f.readlines()
+                itemListLen = len(document)
+                for i in range(len(document)):
+                    if "Items in Room" in document[i]:
+                        itemStart = i + 1
+                    if "NPCs in room" in document[i]:
+                        npcStart = i + 1
+                for i in range(itemStart, (npcStart-1)):
+                    itemRoomRange = document[i]
+                    itemRoomRange = itemRoomRange.rstrip("\n")
+                    roomItemList.append(itemRoomRange)
+                for i in range(npcStart, (len(document))):
+                    npcRoomRange = document[i]
+                    npcRoomRange = npcRoomRange.rstrip("\n")
+                    roomNpcList.append(npcRoomRange)
+                for line in document:
+                    if "Room Name" in line:
+                        name = line.split(":")[1]
+                        name = name.rstrip("\n")
+                        roomBuildName = name
+                    if "Wall color" in line:
+                        color = line.split(":")[1]
+                        color = color.rstrip("\n")
+                        roomBuildColor = color
+                    if "Unique Features" in line:
+                        feature = line.split(":")[1]
+                        feature = feature.rstrip("\n")
+                        roomBuildFeatures = feature
+                    if "Floor Description" in line:
+                        floor = line.split(":")[1]
+                        floor = floor.rstrip("\n")
+                        roomBuildFloor = floor
+                    if "Connecting Rooms" in line:
+                        cRoom = line.split(":")[1]
+                        cRoom = cRoom.rstrip("\n")
+                        roomBuildcRooms = cRoom
+                    if "Room Status" in line:
+                        rStatus = line.split(":")[1]
+                        rStatus = rStatus.rstrip("\n")
+                        roomBuildStatus = rStatus
+
+                roomName = Room(roomBuildName, roomBuildColor, roomBuildFeatures,
+                                roomBuildFloor, roomBuildcRooms, roomBuildStatus,
+                                roomItemList, roomNpcList)
+                roomObjects.append(roomName)  # append object to list for zipping
+                document = ""
+                f.close()
 
     if folderName is "books":
         # zips the two lists as a dictionary (keys are strings: values are objects)
@@ -369,9 +426,13 @@ def file_scan(folderName):  # "books", "npcs", "items"
         roomObjectLookup = dict(zip(roomTitles, roomObjects))
         return(roomObjectLookup)
 
+rooms = file_scan("rooms")
+roomList = list(rooms.keys())
+print("List of rooms: {}".format(roomList))
+print(rooms["Lab"].return_npcPresent())
 
 """ ITEM example of creating the items
-scanning all files and pulling dic key and damage"""
+scanning all files and pulling dict key and damage"""
 # items = file_scan("items")
 # itemDisplay = list(items.keys())
 # print("{} does a total of {} damage!".format(itemDisplay[0], items["Thor'S Hammer"].return_itemDamage()))
