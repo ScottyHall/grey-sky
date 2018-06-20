@@ -225,18 +225,6 @@ class Book(Item):
         return self.bookWriting[pageNO]
 
 
-char1 = Person("Tubby", "Tubbs", 25,
-               "this is the bg of Mr. Tubbs", 'm',
-               75, 100, 0)
-
-room1 = Room("Lab", "purple", ["smelly", "damp", "dirty"],
-             "messy", "none", ["cold", "flooded"],
-             ["key", "book", "table"], ["Tubby"])
-room2 = Room("Kitchen", "purple", ["smelly", "damp", "dirty"],
-             "messy", "none", ["cold", "flooded"],
-             ["key", "book", "table"], ["Henry"])
-
-
 # scans for .txt files in given folder to auto-add items, npcs, and books
 def file_scan(folderName):  # "books", "npcs", "items"
     bookObjects = []  # used for object reference of all books created
@@ -415,26 +403,34 @@ def file_scan(folderName):  # "books", "npcs", "items"
         # zips the two lists as a dictionary (keys are strings: values are objects)
         bookObjectLookup = dict(zip(bookTitles, bookObjects))
         # remember to build the book association to a room
+        print("Loaded files from 'books/'")
         return(bookObjectLookup)
     elif folderName is "npcs":
         npcObjectLookup = dict(zip(npcTitles, npcObjects))
+        print("Loaded files from 'npcs/'")
         return(npcObjectLookup)
     elif folderName is "items":
         itemObjectLookup = dict(zip(itemTitles, itemObjects))
+        print("Loaded files from 'items/'")
         return(itemObjectLookup)
     elif folderName is "rooms":
         roomObjectLookup = dict(zip(roomTitles, roomObjects))
+        print("Loaded files from 'rooms/'")
         return(roomObjectLookup)
 
-rooms = file_scan("rooms")
-roomList = list(rooms.keys())
-print("List of rooms: {}".format(roomList))
-print(rooms["Lab"].return_npcPresent())
+
+""" ROOM example of creating the rooms
+scanning all files and pulling information"""
+# rooms = file_scan("rooms")
+# roomList = list(rooms.keys())
+# print("List of rooms: {}".format(roomList))
+# print(rooms["Lab"].return_npcPresent())
 
 """ ITEM example of creating the items
 scanning all files and pulling dict key and damage"""
 # items = file_scan("items")
 # itemDisplay = list(items.keys())
+# print(itemDisplay)
 # print("{} does a total of {} damage!".format(itemDisplay[0], items["Thor'S Hammer"].return_itemDamage()))
 
 
@@ -451,11 +447,46 @@ First book in object list, 3rd index (2nd line of txt)"""
 # print(books["book1"].return_writing(1))
 # print(books["The King Who Ruled the World"].return_writing(3))
 
+# scan through files
+rooms = file_scan("rooms")
+items = file_scan("items")
+npcs = file_scan("npcs")
+books = file_scan("books")
 
-# iterates through room status list
-def room_status(room):
-    for i in range(len(room.return_roomStatus())):
-        print("{} {}: {}".format(room.roomName, i + 1, room.roomStatus[i]))
+# define list of valid definitions
+roomList = list(rooms.keys())
+itemList = list(items.keys())
+npcList = list(npcs.keys())
+bookList = list(books.keys())
+
+# return room status
+# print(rooms[roomList[1]].return_roomStatus())
+# print(rooms["Lab"].return_roomStatus())
+
+
+def valid(testItem, typeTest):
+    # checks if the item has been created
+    if testItem in roomList and typeTest is "room":
+        return True
+    elif testItem in itemList and typeTest is "item":
+        return True
+    elif testItem in npcList and typeTest is "npc":
+        return True
+    elif testItem in bookList and typeTest is "book":
+        return True
+    else:
+        if typeTest is "room":
+            print("Error: Room is not valid")
+            return False
+        elif typeTest is "item":
+            print("Error: Item is not valid")
+            return False
+        elif typeTest is "npc":
+            print("Error: NPC is not valid")
+            return False
+        elif typeTest is "book":
+            print("Error: Book is not valid")
+            return False
 
 
 # iterates through room item keys
@@ -484,6 +515,19 @@ def npc_changeroom(currentRoom, npc, newRoom):
             print("Successfully removed '{}', from {}.\nChanged to {}".format(npcName, currentRoom.roomName, newRoom.roomName))
 
 
+""" example and testing of adding people and rooms
+without a file to pull it from
+char1 = Person("Tubby", "Tubbs", 25,
+               "this is the bg of Mr. Tubbs", 'm',
+               75, 100, 0)
+
+room1 = Room("Lab", "purple", ["smelly", "damp", "dirty"],
+             "messy", "none", ["cold", "flooded"],
+             ["key", "book", "table"], ["Tubby"])
+room2 = Room("Kitchen", "purple", ["smelly", "damp", "dirty"],
+             "messy", "none", ["cold", "flooded"],
+             ["key", "book", "table"], ["Henry"])
+
 rm_roomItem(room1, "key")
 
 
@@ -493,4 +537,4 @@ room_itemKeys(room1)
 print("\n{}".format(room1.return_npcPresent()))
 npc_changeroom(room1, char1, room2)
 print("\n{}".format(room1.return_npcPresent()))
-print("\n{}".format(room2.return_npcPresent()))
+print("\n{}".format(room2.return_npcPresent()))"""
