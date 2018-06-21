@@ -1,0 +1,13 @@
+First Name:Thomas
+Last Name:Blortworth
+Age:38
+Background:Auditor Extraordinaire. The best in the business. Everyone who is anyone hires Thomas Blortworth to look over the books and investigate an organization before moving forward with large mergers. He's simply the best.
+Gender ('m'/'f':m
+Strength (0 - 100):75
+Health (0 - 100):100
+Infected Status (0 or 1):0
+Current Room:Outdoors
+Inventory (separate with lines):
+Pencil
+Calculator
+Backpack
