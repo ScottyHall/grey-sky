@@ -28,6 +28,12 @@ class Person(object):
         self.strength = strength
         self.health = health
         self.infectedStatus = infectedStatus
+
+        self.intro = ""
+        self.job = ""
+        self.secret = ""
+        self.farewell = ""
+
         self.inventory = inv
         self.currentRoom = ""
 
@@ -62,6 +68,18 @@ class Person(object):
     def return_currentroom(self):
         return self.currentRoom
 
+    def return_intro(self):
+        return self.intro
+
+    def return_job(self):
+        return self.job
+
+    def return_secret(self):
+        return self.secret
+
+    def return_farewell(self):
+        return self.farewell
+
     # setters for person
     def set_first(self, first):
         self.firstName = first
@@ -89,6 +107,18 @@ class Person(object):
 
     def set_currentRoom(self, room):
         self.currentRoom = room
+
+    def set_intro(self, intro):
+        self.intro = intro
+
+    def set_job(self, job):
+        self.job = job
+
+    def set_secret(self, secret):
+        self.secret = secret
+
+    def set_farewell(self, farewell):
+        self.farewell = farewell
 
 
 class Room(object):
@@ -388,9 +418,25 @@ def file_scan(folderName):  # "books", "npcs", "items"
                         infected = infected.rstrip("\n")
                         infected = int(infected)
                         npcBuildInfected = infected
+                    if "Intro" in line:
+                        intro = line.split(":")[1]
+                        intro = intro.rstrip("\n")
+                        npcBuildIntro = intro
+                    if "Job Description" in line:
+                        job = line.split(":")[1]
+                        job = job.rstrip("\n")
+                        npcBuildJob = job
+                    if "Secret known" in line:
+                        secret = line.split(":")[1]
+                        secret = secret.rstrip("\n")
+                        npcBuildSecret = secret
+                    if "Farewell" in line:
+                        farewell = line.split(":")[1]
+                        farewell = farewell.rstrip("\n")
+                        npcBuildFarewell = farewell
                     if "Inventory" in line and folderName is "npcs":
                         itemListLen = len(document)
-                        for i in range(10, itemListLen):
+                        for i in range(14, itemListLen):
                             itemToAdd = document[i]
                             itemToAdd = itemToAdd.rstrip("\n")
                             itemToAdd = itemToAdd.title()
@@ -413,6 +459,10 @@ def file_scan(folderName):  # "books", "npcs", "items"
                                      npcBuildStrength, npcBuildHealth,
                                      npcBuildInfected, npcItemList)
                     npcObjects.append(npcName)  # append object to list for zipping
+                    npcName.set_intro(npcBuildIntro)
+                    npcName.set_job(npcBuildJob)
+                    npcName.set_secret(npcBuildSecret)
+                    npcName.set_farewell(npcBuildFarewell)
                 elif folderName is "user":
                     npcName = Person(npcBuildFirstName, npcBuildLastName,
                                      npcBuildAge, npcBuildBG, npcBuildGender,
@@ -540,6 +590,10 @@ def game_loop():
                 userCurrent = user["User"].return_currentroom()
                 print("\n\nCurrent individuals in the {}:".format(userCurrent))
                 print(rooms[userCurrent].return_npcPresent())
+                userInput = input("Enter the individual you wish to speak with: ")
+                userInput = userInput.title()
+                if valid(userInput, "npc") is True:
+                    print("\n\n\n{}: {}".format(userInput, npcs[userInput].return_intro()))
             else:
                 print("ERROR: User is in a room that doesn't exist")
         elif choice in use:
