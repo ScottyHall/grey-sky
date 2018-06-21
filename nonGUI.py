@@ -531,14 +531,6 @@ npcs = file_scan("npcs")
 user = file_scan("user")
 books = file_scan("books")
 
-# define list of valid definitions
-roomList = list(rooms.keys())
-itemList = list(items.keys())
-npcList = list(npcs.keys())
-bookList = list(books.keys())
-userList = list(user.keys())
-
-
 
 # print(user["User"].return_first())
 
@@ -625,6 +617,7 @@ def game_loop():
         else:
             print("Error: command not recognized. Enter 'help' for more details.\n")
 
+
 def npc_loop():
     """ method loops through talking with an npc"""
     npcChoiceMessage = """
@@ -637,7 +630,15 @@ def npc_loop():
     while True:
         userInput = input("Test input here")
 
+
 def valid(testItem, typeTest):
+    # define list of valid definitions
+    roomList = list(rooms.keys())
+    itemList = list(items.keys())
+    npcList = list(npcs.keys())
+    bookList = list(books.keys())
+    userList = list(user.keys())
+    
     # checks if the item has been created
     if testItem in roomList and typeTest is "room":
         return True
