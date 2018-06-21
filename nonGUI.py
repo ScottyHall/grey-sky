@@ -238,6 +238,8 @@ def file_scan(folderName):  # "books", "npcs", "items"
     roomTitles = []
     roomItemList = []
     roomNpcList = []
+    userTitle = []
+    userObject = []
     for file in os.listdir(folderName):  # checks for folder names
         if file.endswith(".txt"):
             fileName = file.split(".")[0]  # ditches the '.txt'
@@ -261,9 +263,91 @@ def file_scan(folderName):  # "books", "npcs", "items"
                         break
                     file.add_bookPage(line)
                 f.close()
-            elif folderName is "npcs":
-                npcTitles.append(fileName.title())  # save file name as string list item
-                # npcObjects.append(file)  # save file as object list
+            elif folderName is "items":
+                itemTitles.append(fileName.title())  # save file name as string list item
+                document = f.readlines()
+                for line in document:
+                    if "Item Name" in line:
+                        name = line.split(":")[1]
+                        name = name.rstrip("\n")
+                        itemBuildFirstName = name
+                    if "Item Damage" in line:
+                        dmg = line.split(":")[1]
+                        dmg = dmg.rstrip("\n")
+                        dmg = int(dmg)
+                        itemBuildDamage = dmg
+                    if "Item Ability" in line:
+                        ability = line.split(":")[1]
+                        ability = ability.rstrip("\n")
+                        itemBuildAbility = ability
+                    if "Item Material" in line:
+                        material = line.split(":")[1]
+                        material = material.rstrip("\n")
+                        itemBuildMaterial = material
+                    if "Item Description" in line:
+                        description = line.split(":")[1]
+                        description = description.rstrip("\n")
+                        itemBuildDesc = description
+                itemName = Item(itemBuildFirstName, itemBuildDamage,
+                                itemBuildAbility, itemBuildMaterial, itemBuildDesc)
+                itemObjects.append(itemName)  # append object to list for zipping
+                document = ""
+                f.close()
+            elif folderName is "rooms":
+                roomTitles.append(fileName.title())  # save file name as string list item
+                document = ""
+                document = f.readlines()
+                itemListLen = len(document)
+                for i in range(len(document)):
+                    if "Items in Room" in document[i]:
+                        itemStart = i + 1
+                    if "NPCs in room" in document[i]:
+                        npcStart = i + 1
+                for i in range(itemStart, (npcStart-1)):
+                    itemRoomRange = document[i]
+                    itemRoomRange = itemRoomRange.rstrip("\n")
+                    roomItemList.append(itemRoomRange)
+                for i in range(npcStart, (len(document))):
+                    npcRoomRange = document[i]
+                    npcRoomRange = npcRoomRange.rstrip("\n")
+                    roomNpcList.append(npcRoomRange)
+                for line in document:
+                    if "Room Name" in line:
+                        name = line.split(":")[1]
+                        name = name.rstrip("\n")
+                        roomBuildName = name
+                    if "Wall color" in line:
+                        color = line.split(":")[1]
+                        color = color.rstrip("\n")
+                        roomBuildColor = color
+                    if "Unique Features" in line:
+                        feature = line.split(":")[1]
+                        feature = feature.rstrip("\n")
+                        roomBuildFeatures = feature
+                    if "Floor Description" in line:
+                        floor = line.split(":")[1]
+                        floor = floor.rstrip("\n")
+                        roomBuildFloor = floor
+                    if "Connecting Rooms" in line:
+                        cRoom = line.split(":")[1]
+                        cRoom = cRoom.rstrip("\n")
+                        roomBuildcRooms = cRoom
+                    if "Room Status" in line:
+                        rStatus = line.split(":")[1]
+                        rStatus = rStatus.rstrip("\n")
+                        roomBuildStatus = rStatus
+                roomName = Room(roomBuildName, roomBuildColor, roomBuildFeatures,
+                                roomBuildFloor, roomBuildcRooms, roomBuildStatus,
+                                roomItemList, roomNpcList)
+                roomObjects.append(roomName)  # append object to list for zipping
+                document = ""
+                f.close()
+            elif folderName is "npcs" or "user":
+                if folderName is "npcs":
+                    npcTitles.append(fileName.title())  # save file name as string list item
+                    # npcObjects.append(file)  # save file as object list
+                elif folderName is "user":
+                    userTitle.append(fileName.title())
                 document = ""
                 document = f.readlines()
                 for line in document:
@@ -310,105 +394,38 @@ def file_scan(folderName):  # "books", "npcs", "items"
                             itemToAdd = itemToAdd.rstrip("\n")
                             itemToAdd = itemToAdd.title()
                             npcItemList.append(itemToAdd)
-                npcName = Person(npcBuildFirstName, npcBuildLastName,
-                                 npcBuildAge, npcBuildBG, npcBuildGender,
-                                 npcBuildStrength, npcBuildHealth, npcBuildInfected)
-                npcObjects.append(npcName)  # append object to list for zipping
+                    if folderName is "user":
+                        if "Current Room" in line:
+                            currentRoom = line.split(":")[1]
+                            currentRoom = currentRoom.rstrip("\n")
+                            userBuildRoom = currentRoom
+                if folderName is "npcs":
+                    npcName = Person(npcBuildFirstName, npcBuildLastName,
+                                     npcBuildAge, npcBuildBG, npcBuildGender,
+                                     npcBuildStrength, npcBuildHealth, npcBuildInfected)
+                    npcObjects.append(npcName)  # append object to list for zipping
+                elif folderName is "user":
+                    npcName = Person(npcBuildFirstName, npcBuildLastName,
+                                     npcBuildAge, npcBuildBG, npcBuildGender,
+                                     npcBuildStrength, npcBuildHealth, npcBuildInfected)
+                    npcName.set_currentRoom(userBuildRoom)
+                    userObject.append(npcName)
                 document = ""
                 f.close()
-
-            elif folderName is "items":
-                itemTitles.append(fileName.title())  # save file name as string list item
-                document = f.readlines()
-                for line in document:
-                    if "Item Name" in line:
-                        name = line.split(":")[1]
-                        name = name.rstrip("\n")
-                        itemBuildFirstName = name
-                    if "Item Damage" in line:
-                        dmg = line.split(":")[1]
-                        dmg = dmg.rstrip("\n")
-                        dmg = int(dmg)
-                        itemBuildDamage = dmg
-                    if "Item Ability" in line:
-                        ability = line.split(":")[1]
-                        ability = ability.rstrip("\n")
-                        itemBuildAbility = ability
-                    if "Item Material" in line:
-                        material = line.split(":")[1]
-                        material = material.rstrip("\n")
-                        itemBuildMaterial = material
-                    if "Item Description" in line:
-                        description = line.split(":")[1]
-                        description = description.rstrip("\n")
-                        itemBuildDesc = description
-                itemName = Item(itemBuildFirstName, itemBuildDamage,
-                                itemBuildAbility, itemBuildMaterial, itemBuildDesc)
-                itemObjects.append(itemName)  # append object to list for zipping
-                document = ""
-                f.close()
-
-            elif folderName is "rooms":
-                roomTitles.append(fileName.title())  # save file name as string list item
-                document = ""
-                document = f.readlines()
-                itemListLen = len(document)
-                for i in range(len(document)):
-                    if "Items in Room" in document[i]:
-                        itemStart = i + 1
-                    if "NPCs in room" in document[i]:
-                        npcStart = i + 1
-                for i in range(itemStart, (npcStart-1)):
-                    itemRoomRange = document[i]
-                    itemRoomRange = itemRoomRange.rstrip("\n")
-                    roomItemList.append(itemRoomRange)
-                for i in range(npcStart, (len(document))):
-                    npcRoomRange = document[i]
-                    npcRoomRange = npcRoomRange.rstrip("\n")
-                    roomNpcList.append(npcRoomRange)
-                for line in document:
-                    if "Room Name" in line:
-                        name = line.split(":")[1]
-                        name = name.rstrip("\n")
-                        roomBuildName = name
-                    if "Wall color" in line:
-                        color = line.split(":")[1]
-                        color = color.rstrip("\n")
-                        roomBuildColor = color
-                    if "Unique Features" in line:
-                        feature = line.split(":")[1]
-                        feature = feature.rstrip("\n")
-                        roomBuildFeatures = feature
-                    if "Floor Description" in line:
-                        floor = line.split(":")[1]
-                        floor = floor.rstrip("\n")
-                        roomBuildFloor = floor
-                    if "Connecting Rooms" in line:
-                        cRoom = line.split(":")[1]
-                        cRoom = cRoom.rstrip("\n")
-                        roomBuildcRooms = cRoom
-                    if "Room Status" in line:
-                        rStatus = line.split(":")[1]
-                        rStatus = rStatus.rstrip("\n")
-                        roomBuildStatus = rStatus
-
-                roomName = Room(roomBuildName, roomBuildColor, roomBuildFeatures,
-                                roomBuildFloor, roomBuildcRooms, roomBuildStatus,
-                                roomItemList, roomNpcList)
-                roomObjects.append(roomName)  # append object to list for zipping
-                document = ""
-                f.close()
-
     if folderName is "books":
         # zips the two lists as a dictionary (keys are strings: values are objects)
         bookObjectLookup = dict(zip(bookTitles, bookObjects))
         # remember to build the book association to a room
-        print("Loaded files from 'books/'")
+        print("Loaded files from 'books/'\n\n\n\n")
         return(bookObjectLookup)
     elif folderName is "npcs":
         npcObjectLookup = dict(zip(npcTitles, npcObjects))
         print("Loaded files from 'npcs/'")
         return(npcObjectLookup)
+    elif folderName is "user":
+        userObjectLookup = dict(zip(userTitle, userObject))
+        print("Loaded files from 'user/'")
+        return(userObjectLookup)
     elif folderName is "items":
         itemObjectLookup = dict(zip(itemTitles, itemObjects))
         print("Loaded files from 'items/'")
@@ -451,6 +468,7 @@ First book in object list, 3rd index (2nd line of txt)"""
 rooms = file_scan("rooms")
 items = file_scan("items")
 npcs = file_scan("npcs")
+user = file_scan("user")
 books = file_scan("books")
 
 # define list of valid definitions
@@ -458,10 +476,72 @@ roomList = list(rooms.keys())
 itemList = list(items.keys())
 npcList = list(npcs.keys())
 bookList = list(books.keys())
+userList = list(user.keys())
+
+print(rooms["Lab"].return_npcPresent())
+
+# print(user["User"].return_first())
 
 # return room status
 # print(rooms[roomList[1]].return_roomStatus())
 # print(rooms["Lab"].return_roomStatus())
+
+
+def welcome_message():
+    # open the map file and set to gameMap
+    # init welcome message
+    welcome = open("game/welcome.txt", "r")
+    welcomeMsg = welcome.read()
+    welcome.close()
+
+    print(welcomeMsg)
+    input("\n\nPress enter to continue")
+    print("\n\n\n\n\n\n\n")
+
+
+def game_loop():
+    talk = ['talk', 't', '1']
+    use = ['use', 'u', '2']
+    inspect = ['inspect', 'i', '3']
+    inventory = ['inventory', 'inv', '4']
+    getMap = ['map', 'm', '5']
+    displayHelp = ['help', 'h', '6']
+
+    choicesMessage = """Current Options:
+    Talk(t, 1) - interact with another character
+    Use(u, 2) - use an item located in your inventory
+    Inspect(i, 3) - interact with an item in the current room
+    Inventory(inv, 4) - display items located in your inventory
+    Map(m, 5) - display the map"""
+
+    # save game map
+    gameMapFile = open("game/map.txt", "r")
+    gameMap = gameMapFile.read()
+    gameMapFile.close()
+
+    print(choicesMessage)
+
+    while True:
+        # main input loop for user choice
+        choice = input("Enter your action: ").lower()
+        if choice in talk:
+            print("user choice = talk")
+            if valid(user["User"].return_currentroom(), "room") is True:
+                userCurrent = user["User"].return_currentroom()
+                print("\n\nCurrent Room: {}".format(userCurrent))
+                print(rooms[userCurrent].return_npcPresent())
+            else:
+                print("ERROR: User is in a room that doesn't exist")
+        elif choice in use:
+            print("user choice = use")
+        elif choice in inspect:
+            print("user choice = inspect")
+        elif choice in inventory:
+            print("user choice = inventory")
+        elif choice in getMap:
+            print(gameMap)
+        elif choice in displayHelp:
+            print(choicesMessage)
 
 
 def valid(testItem, typeTest):
@@ -514,6 +594,9 @@ def npc_changeroom(currentRoom, npc, newRoom):
             newRoom.add_npc(npc.firstName)
             print("Successfully removed '{}', from {}.\nChanged to {}".format(npcName, currentRoom.roomName, newRoom.roomName))
 
+
+welcome_message()
+game_loop()
 
 """ example and testing of adding people and rooms
 without a file to pull it from
