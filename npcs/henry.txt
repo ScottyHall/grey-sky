@@ -7,6 +7,10 @@ Strength (0 - 100):65
 Health (0 - 100):100
 Infected Status (0 or 1):0
 Current Room:cafeteria
+Intro:Intro Text here
+Job Description:Job dialog here
+Secret known:Something not everyone should know
+Farewell:Cya later!
 Inventory (separate with lines):
 Spray Bottle
 Microfiber Cloth
