@@ -539,6 +539,7 @@ bookList = list(books.keys())
 userList = list(user.keys())
 
 
+
 # print(user["User"].return_first())
 
 # return room status
@@ -558,6 +559,11 @@ def welcome_message():
     print("\n\n\n\n\n\n\n")
 
 
+# checks the system and clears the terminal accordingly
+def clear_terminal():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
 def game_loop():
     talk = ['talk', 't', '1']
     use = ['use', 'u', '2']
@@ -574,17 +580,17 @@ def game_loop():
     Map(m, 5) - display the map
     Help(h, 6) - show options"""
 
-    # save game map
-    gameMapFile = open("game/map.txt", "r")
-    gameMap = gameMapFile.read()
-    gameMapFile.close()
-
+    clear_terminal()
     print(choicesMessage)
 
     while True:
         # main input loop for user choice
-        choice = input("Enter your action: ").lower()
+        if valid(user["User"].return_currentroom(), "room") is True:
+                userCurrent = user["User"].return_currentroom()
+                print("\n\nCurrent Room: {}".format(userCurrent))
+        choice = input("\n'h' to display options\nEnter your action: ").lower()
         if choice in talk:
+            clear_terminal()
             print("user choice = talk")
             if valid(user["User"].return_currentroom(), "room") is True:
                 userCurrent = user["User"].return_currentroom()
@@ -593,7 +599,10 @@ def game_loop():
                 userInput = input("Enter the individual you wish to speak with: ")
                 userInput = userInput.title()
                 if valid(userInput, "npc") is True:
+                    clear_terminal()
                     print("\n\n\n{}: {}".format(userInput, npcs[userInput].return_intro()))
+                    print("Current Options with {}:".format(userInput))
+                    npc_loop()
             else:
                 print("ERROR: User is in a room that doesn't exist")
         elif choice in use:
@@ -606,12 +615,27 @@ def game_loop():
             print(user["User"].return_inventory())
             print("\n\n")
         elif choice in getMap:
+            # save game map
+            gameMapFile = open("game/map.txt", "r")
+            gameMap = gameMapFile.read()
+            gameMapFile.close()
             print(gameMap)
         elif choice in displayHelp:
             print(choicesMessage)
         else:
             print("Error: command not recognized. Enter 'help' for more details.\n")
 
+def npc_loop():
+    """ method loops through talking with an npc"""
+    npcChoiceMessage = """
+    Scan(s, 1) - ask to scan employee badge
+    Ask(a, 2) - ask about work
+    Secret(se, 3) - try to get more information
+    Bye(b, 4) - say goodbye"""
+
+    print(npcChoiceMessage)
+    while True:
+        userInput = input("Test input here")
 
 def valid(testItem, typeTest):
     # checks if the item has been created
