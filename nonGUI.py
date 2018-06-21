@@ -19,7 +19,7 @@ class Person(object):
 
     def __init__(self, firstName, lastName, age,
                  background, gender, strength,
-                 health, infectedStatus):
+                 health, infectedStatus, inv):
         self.firstName = firstName
         self.lastName = lastName
         self.age = age
@@ -28,7 +28,7 @@ class Person(object):
         self.strength = strength
         self.health = health
         self.infectedStatus = infectedStatus
-        self.inventory = []
+        self.inventory = inv
         self.currentRoom = ""
 
     # returns for person
@@ -232,6 +232,7 @@ def file_scan(folderName):  # "books", "npcs", "items"
     npcObjects = []
     npcTitles = []
     npcItemList = []  # stores npc inventory list
+    userItemList = []
     itemObjects = []
     itemTitles = []
     roomObjects = []
@@ -387,13 +388,20 @@ def file_scan(folderName):  # "books", "npcs", "items"
                         infected = infected.rstrip("\n")
                         infected = int(infected)
                         npcBuildInfected = infected
-                    if "Inventory" in line:
+                    if "Inventory" in line and folderName is "npcs":
                         itemListLen = len(document)
                         for i in range(10, itemListLen):
                             itemToAdd = document[i]
                             itemToAdd = itemToAdd.rstrip("\n")
                             itemToAdd = itemToAdd.title()
                             npcItemList.append(itemToAdd)
+                    if "Inventory" in line and folderName is "user":
+                        itemListLen = len(document)
+                        for i in range(10, itemListLen):
+                            itemToAdd = document[i]
+                            itemToAdd = itemToAdd.rstrip("\n")
+                            itemToAdd = itemToAdd.title()
+                            userItemList.append(itemToAdd)
                     if folderName is "user":
                         if "Current Room" in line:
                             currentRoom = line.split(":")[1]
@@ -402,12 +410,14 @@ def file_scan(folderName):  # "books", "npcs", "items"
                 if folderName is "npcs":
                     npcName = Person(npcBuildFirstName, npcBuildLastName,
                                      npcBuildAge, npcBuildBG, npcBuildGender,
-                                     npcBuildStrength, npcBuildHealth, npcBuildInfected)
+                                     npcBuildStrength, npcBuildHealth,
+                                     npcBuildInfected, npcItemList)
                     npcObjects.append(npcName)  # append object to list for zipping
                 elif folderName is "user":
                     npcName = Person(npcBuildFirstName, npcBuildLastName,
                                      npcBuildAge, npcBuildBG, npcBuildGender,
-                                     npcBuildStrength, npcBuildHealth, npcBuildInfected)
+                                     npcBuildStrength, npcBuildHealth,
+                                     npcBuildInfected, userItemList)
                     npcName.set_currentRoom(userBuildRoom)
                     userObject.append(npcName)
                 document = ""
@@ -478,7 +488,6 @@ npcList = list(npcs.keys())
 bookList = list(books.keys())
 userList = list(user.keys())
 
-print(rooms["Lab"].return_npcPresent())
 
 # print(user["User"].return_first())
 
@@ -512,7 +521,8 @@ def game_loop():
     Use(u, 2) - use an item located in your inventory
     Inspect(i, 3) - interact with an item in the current room
     Inventory(inv, 4) - display items located in your inventory
-    Map(m, 5) - display the map"""
+    Map(m, 5) - display the map
+    Help(h, 6) - show options"""
 
     # save game map
     gameMapFile = open("game/map.txt", "r")
@@ -528,20 +538,25 @@ def game_loop():
             print("user choice = talk")
             if valid(user["User"].return_currentroom(), "room") is True:
                 userCurrent = user["User"].return_currentroom()
-                print("\n\nCurrent Room: {}".format(userCurrent))
+                print("\n\nCurrent individuals in the {}:".format(userCurrent))
                 print(rooms[userCurrent].return_npcPresent())
             else:
                 print("ERROR: User is in a room that doesn't exist")
         elif choice in use:
-            print("user choice = use")
+            print("\n\nCurrent Inventory Items:")
+            print(user["User"].return_inventory())
         elif choice in inspect:
             print("user choice = inspect")
         elif choice in inventory:
-            print("user choice = inventory")
+            print("\n\nCurrent Inventory Items:")
+            print(user["User"].return_inventory())
+            print("\n\n")
         elif choice in getMap:
             print(gameMap)
         elif choice in displayHelp:
             print(choicesMessage)
+        else:
+            print("Error: command not recognized. Enter 'help' for more details.\n")
 
 
 def valid(testItem, typeTest):
