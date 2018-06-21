@@ -6,7 +6,7 @@ Gender ('m'/'f':m
 Strength (0 - 100):75
 Health (0 - 100):100
 Infected Status (0 or 1):0
-Current Room:Outdoors
+Current Room:Kitchen
 Inventory (separate with lines):
 Pencil
 Calculator
