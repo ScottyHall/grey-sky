@@ -5,13 +5,9 @@ Floor Description:Squeaky clean
 Connecting Rooms (doors to):
 Room Status:warm
 Items in Room (use new lines for each item):
-book1
-The King Who Ruled the World
-Will
-This
-Catch
-Them
-All!!!!!!
+Beaker
+Glass
+Explosives
 NPCs in room (use new lines for each NPC):
 Henry
 Peter
