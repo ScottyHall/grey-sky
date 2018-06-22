@@ -1,5 +1,5 @@
-# Escape from Grey Sky Labs
-## A simple gui text-based game written in python
+# Grey Sky Labs
+## A simple text-based game
 
 Background:
 
@@ -23,4 +23,5 @@ Book title = file name.txt
 Example: "Dictionary.txt"
 
 Each line of the text file will be split into a page of the book.
+
 
