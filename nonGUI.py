@@ -1,4 +1,6 @@
 import os
+import time
+import sys
 
 
 class Person(object):
@@ -531,6 +533,10 @@ npcs = file_scan("npcs")
 user = file_scan("user")
 books = file_scan("books")
 
+# typing speed for 'print_slow'
+standardSpeed = 0.05
+fastSpeed = 0.001
+
 
 # print(user["User"].return_first())
 
@@ -539,24 +545,27 @@ books = file_scan("books")
 # print(rooms["Lab"].return_roomStatus())
 
 
-def welcome_message():
-    # open the map file and set to gameMap
-    # init welcome message
-    welcome = open("game/welcome.txt", "r")
-    welcomeMsg = welcome.read()
-    welcome.close()
-
-    print(welcomeMsg)
-    input("\n\nPress enter to continue")
-    print("\n\n\n\n\n\n\n")
-
-
 # checks the system and clears the terminal accordingly
 def clear_terminal():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
+def welcome_message():
+    # open the map file and set to gameMap
+    # init welcome message
+    clear_terminal()
+    welcome = open("game/welcome.txt", "r")
+    welcomeMsg = welcome.read()
+    welcome.close()
+
+    print_slow(welcomeMsg, fastSpeed, "noWrap")
+    print_slow("Press enter to continue", standardSpeed, "")
+    input("")
+    print("\n\n\n\n\n\n\n")
+
+
 def game_loop():
+    """ game_loop loops through the main menu of the game """
     talk = ['talk', 't', '1']
     use = ['use', 'u', '2']
     inspect = ['inspect', 'i', '3']
@@ -580,39 +589,47 @@ def game_loop():
         if valid(user["User"].return_currentroom(), "room") is True:
                 userCurrent = user["User"].return_currentroom()
                 print("\n\nCurrent Room: {}".format(userCurrent))
+        print("Health: {}+".format(user["User"].return_health()))
         choice = input("\n'h' to display options\nEnter your action: ").lower()
         if choice in talk:
             clear_terminal()
-            print("user choice = talk")
             if valid(user["User"].return_currentroom(), "room") is True:
                 userCurrent = user["User"].return_currentroom()
-                print("\n\nCurrent individuals in the {}:".format(userCurrent))
+                print_slow("Current individuals in the {}:".format(userCurrent), standardSpeed, "noWrap")
                 print(rooms[userCurrent].return_npcPresent())
                 userInput = input("Enter the individual you wish to speak with: ")
                 userInput = userInput.title()
                 if valid(userInput, "npc") is True:
                     clear_terminal()
-                    print("\n\n\n{}: {}".format(userInput, npcs[userInput].return_intro()))
+                    print_slow("{}: {}".format(userInput, npcs[userInput].return_intro()), standardSpeed, "wrap")
                     print("Current Options with {}:".format(userInput))
                     npc_loop()
             else:
                 print("ERROR: User is in a room that doesn't exist")
         elif choice in use:
-            print("\n\nCurrent Inventory Items:")
+            clear_terminal()
+            print_slow("Current Inventory Items:", standardSpeed, "noWrap")
             print(user["User"].return_inventory())
         elif choice in inspect:
+            clear_terminal()
             print("user choice = inspect")
         elif choice in inventory:
-            print("\n\nCurrent Inventory Items:")
+            clear_terminal()
+            print_slow("Current Inventory Items:", standardSpeed, "noWrap")
             print(user["User"].return_inventory())
             print("\n\n")
         elif choice in getMap:
+            clear_terminal()
             # save game map
             gameMapFile = open("game/map.txt", "r")
             gameMap = gameMapFile.read()
             gameMapFile.close()
             print(gameMap)
+            print("\nYour Status:")
+            print_slow("Strength: {}".format(user["User"].return_strength()), standardSpeed, "noWrap")
+            print_slow("Infected Status: {}".format(user["User"].return_infected()), standardSpeed, "noWrap")
         elif choice in displayHelp:
+            clear_terminal()
             print(choicesMessage)
         else:
             print("Error: command not recognized. Enter 'help' for more details.\n")
@@ -631,6 +648,32 @@ def npc_loop():
         userInput = input("Test input here")
 
 
+def print_slow(text, delay, inf):
+    """ print each character from text with a delay on the same line
+    text = text to display
+    delay = time between char
+    inf = "noWrap" is ignore text wrap
+    any other value from inf = text wrapping on"""
+    textWrapLength = 50
+    i = 0
+    for char in text:
+        if inf != "noWrap":
+            i = i + 1
+        if i < textWrapLength:
+            print(char, end="")
+            sys.stdout.flush()
+        elif i >= textWrapLength:
+            if char is " " or "-":
+                print(char)
+                i = 0
+            else:
+                print(char, end="")
+                sys.stdout.flush()
+        time.sleep(delay)
+    print("")
+
+
+# checks validity on input with the dict keys from file input
 def valid(testItem, typeTest):
     # define list of valid definitions
     roomList = list(rooms.keys())
@@ -638,7 +681,7 @@ def valid(testItem, typeTest):
     npcList = list(npcs.keys())
     bookList = list(books.keys())
     userList = list(user.keys())
-    
+
     # checks if the item has been created
     if testItem in roomList and typeTest is "room":
         return True
