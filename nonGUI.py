@@ -1,6 +1,7 @@
 import os
 import time
 import sys
+import random
 
 
 class Person(object):
@@ -601,9 +602,9 @@ def game_loop():
                 userInput = userInput.title()
                 if valid(userInput, "npc") is True:
                     clear_terminal()
-                    print_slow("{}: {}".format(userInput, npcs[userInput].return_intro()), standardSpeed, "wrap")
-                    print("Current Options with {}:".format(userInput))
-                    npc_loop()
+                    print("{}:".format(userInput))
+                    print_slow(npcs[userInput].return_intro(), standardSpeed, "wrap")
+                    npc_loop(userInput)
             else:
                 print("ERROR: User is in a room that doesn't exist")
         elif choice in use:
@@ -613,6 +614,7 @@ def game_loop():
         elif choice in inspect:
             clear_terminal()
             print("user choice = inspect")
+            print_slow("Items in {}:\n{}".format(userCurrent, rooms[userCurrent].return_roomItems()), standardSpeed, "wrap")
         elif choice in inventory:
             clear_terminal()
             print_slow("Current Inventory Items:", standardSpeed, "noWrap")
@@ -635,17 +637,57 @@ def game_loop():
             print("Error: command not recognized. Enter 'help' for more details.\n")
 
 
-def npc_loop():
+def npc_loop(npc):
     """ method loops through talking with an npc"""
-    npcChoiceMessage = """
-    Scan(s, 1) - ask to scan employee badge
+    scan = ['scan', 's', '1']
+    ask = ['ask', 'a', '2']
+    secret = ['secret', 'se', '3']
+    bye = ['bye', 'b', '4']
+    displayHelp = ['help', 'h', '5']
+
+    npcChoiceMessage = """    Scan(s, 1) - ask to scan employee badge
     Ask(a, 2) - ask about work
     Secret(se, 3) - try to get more information
-    Bye(b, 4) - say goodbye"""
+    Bye(b, 4) - say goodbye
+    Help(h, 5) - display choices"""
 
+    print("\nCurrent Options with {}:".format(npc))
     print(npcChoiceMessage)
     while True:
-        userInput = input("Test input here")
+        userInput = input("\n'h' to display options\nEnter your action: ")
+        if userInput in scan:
+            print_slow("......................beep......boop", standardSpeed, "noWrap")
+            clear_terminal()
+            print("---Scan-Complete---")
+            print_slow("{} {}".format(npc, npcs[npc].return_last()), standardSpeed, "noWrap")
+            print_slow("Age: {}".format(npcs[npc].return_age()), standardSpeed, "noWrap")
+            print_slow("Gender: {}".format(npcs[npc].return_gender()), standardSpeed, "noWrap")
+            print_slow("Background: {}".format(npcs[npc].return_background()), standardSpeed, "wrap")
+        elif userInput in ask:
+            clear_terminal()
+            print_slow("{}: {}".format(npc, npcs[npc].return_job()), standardSpeed, "noWrap")
+        elif userInput in secret:
+            clear_terminal()
+            if secret_roll(75) is True:
+                print_slow("{}: {}".format(npc, npcs[npc].return_secret()), standardSpeed, "noWrap")
+            else:
+                print("Sorry, I'm not permitted to tell you anything confidential.")
+                npcs[npc].set_secret("Look, I already told you I can't tell you anything else.")
+        elif userInput in bye:
+            clear_terminal()
+            print_slow("{}: {}".format(npc, npcs[npc].return_farewell()), standardSpeed, "noWrap")
+            break
+        elif userInput in displayHelp:
+            print("Current Options with {}:".format(npc))
+            print(npcChoiceMessage)
+
+
+# input percentage of success and return outcome
+def secret_roll(percentage):
+    if random.randrange(1, 101, 1) < percentage:
+        return True
+    else:
+        return False
 
 
 def print_slow(text, delay, inf):
@@ -662,13 +704,12 @@ def print_slow(text, delay, inf):
         if i < textWrapLength:
             print(char, end="")
             sys.stdout.flush()
-        elif i >= textWrapLength:
-            if char is " " or "-":
-                print(char)
-                i = 0
-            else:
-                print(char, end="")
-                sys.stdout.flush()
+        elif i >= textWrapLength and char is " ":
+            print(char)
+            i = 0
+        else:
+            print(char, end="")
+            sys.stdout.flush()
         time.sleep(delay)
     print("")
 
