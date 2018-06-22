@@ -374,6 +374,8 @@ def file_scan(folderName):  # "books", "npcs", "items"
                                 roomBuildFloor, roomBuildcRooms, roomBuildStatus,
                                 roomItemList, roomNpcList)
                 roomObjects.append(roomName)  # append object to list for zipping
+                roomItemList = []
+                roomNpcList = []
                 document = ""
                 f.close()
             elif folderName is "npcs" or "user":
@@ -466,6 +468,7 @@ def file_scan(folderName):  # "books", "npcs", "items"
                     npcName.set_job(npcBuildJob)
                     npcName.set_secret(npcBuildSecret)
                     npcName.set_farewell(npcBuildFarewell)
+                    npcItemList = []
                 elif folderName is "user":
                     npcName = Person(npcBuildFirstName, npcBuildLastName,
                                      npcBuildAge, npcBuildBG, npcBuildGender,
@@ -534,8 +537,9 @@ npcs = file_scan("npcs")
 user = file_scan("user")
 books = file_scan("books")
 
+
 # typing speed for 'print_slow'
-standardSpeed = 0.05
+standardSpeed = 0.05  # time between each character typed
 fastSpeed = 0.001
 
 
@@ -671,7 +675,7 @@ def npc_loop(npc):
             if secret_roll(75) is True:
                 print_slow("{}: {}".format(npc, npcs[npc].return_secret()), standardSpeed, "noWrap")
             else:
-                print("Sorry, I'm not permitted to tell you anything confidential.")
+                print_slow("{}: Sorry, I'm not permitted to tell you anything confidential.".format(npc), standardSpeed, "noWrap")
                 npcs[npc].set_secret("Look, I already told you I can't tell you anything else.")
         elif userInput in bye:
             clear_terminal()
