@@ -12,6 +12,7 @@ This
 Catch
 Them
 All!!!!!!
+Thors Hammer
 NPCs in room (use new lines for each NPC):
 Henry
 Peter
