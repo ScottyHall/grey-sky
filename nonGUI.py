@@ -537,6 +537,8 @@ npcs = file_scan("npcs")
 user = file_scan("user")
 books = file_scan("books")
 
+print(npcs['Henry'].return_inventory())
+
 
 # typing speed for 'print_slow'
 standardSpeed = 0.05  # time between each character typed
@@ -751,6 +753,40 @@ def valid(testItem, typeTest):
             return False
 
 
+# check if the items in list are built
+def check_lists(listToCheck):
+    if listToCheck is "RoomNPCs":
+                pass
+    elif listToCheck is "NPCitems":
+                pass
+    elif listToCheck is "RoomItems":
+        roomList = list(rooms.keys())
+        for room in roomList:
+            roomItems = rooms[room].return_roomItems()
+            for item in roomItems:
+                print("\n")
+                print(item)
+                if valid(item, "item") is True:
+                    print(room)
+                    print("Keep item")
+                    print(item)
+                elif valid(item, "book") is True:
+                    print(room)
+                    print("Keep book")
+                    print(item)
+                elif valid(item, "item") is False:
+                    if valid(item, "book") is False:
+                        print(room)
+                        print("Remove")
+                        print(item)
+                else:
+                    print("Error: 'check_lists' Checking room items failed")
+
+
+    else:
+        print("Error 'check_list' listToCheck not recognized")
+
+
 # iterates through room item keys
 def room_itemKeys(room):
     for i in range(len(room.return_roomItems())):
@@ -777,6 +813,7 @@ def npc_changeroom(currentRoom, npc, newRoom):
             print("Successfully removed '{}', from {}.\nChanged to {}".format(npcName, currentRoom.roomName, newRoom.roomName))
 
 
+check_lists("RoomItems")
 welcome_message()
 game_loop()
 
