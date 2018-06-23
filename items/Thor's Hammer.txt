@@ -1,5 +1,0 @@
-Item Name:Thor's Hammer
-Item Damage (0 - 100):100
-Item Ability (hack, attack, heal, cure, buff, nerf:attack
-Item Material (wood, metal, electronic, breakable, meltable):metal
-Item Description:It's seriously Thor's hammer. This thing is no joke.
