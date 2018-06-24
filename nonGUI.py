@@ -123,6 +123,17 @@ class Person(object):
     def set_farewell(self, farewell):
         self.farewell = farewell
 
+    # add
+    def add_npcItem(self, itemToAdd):
+        self.inventory.append(itemToAdd)
+
+    # remove
+    def del_npcItem(self, itemToRm):
+        if itemToRm in self.inventory:
+            self.inventory.remove(itemToRm)
+            return True
+        return False
+
 
 class Room(object):
     """general room building class to set, edit, and return attributes
@@ -139,7 +150,8 @@ class Room(object):
     """
 
     def __init__(self, roomName, wallColor, uniqueFeatures, floorDescription,
-                 roomConnections, roomStatus, roomItems, npcPresent):
+                 roomConnections, roomStatus, roomItems, npcPresent,
+                 roomLocked, roomKey):
         self.roomName = roomName
         self.wallColor = wallColor
         self.uniqueFeatures = uniqueFeatures
@@ -148,6 +160,8 @@ class Room(object):
         self.roomStatus = roomStatus
         self.roomItems = roomItems
         self.npcPresent = npcPresent
+        self.isLocked = roomLocked
+        self.roomKey = roomKey
 
     # returns for room
     def return_room(self):
@@ -174,6 +188,12 @@ class Room(object):
     def return_npcPresent(self):
         return self.npcPresent
 
+    def return_isLocked(self):
+        return self.isLocked
+
+    def return_key(self):
+        return self.roomKey
+
     # setters for room
     def del_roomItem(self, itemToRm):
         if itemToRm in self.roomItems:
@@ -190,6 +210,14 @@ class Room(object):
     def add_npc(self, npcToAdd):
         self.npcPresent.append(npcToAdd)
 
+    def unlock_room(self):
+        self.isLocked = False
+        print("{} Unlocked".format(self.roomName))
+
+    def lock_room(self):
+        self.isLocked = True
+        print("{} Locked".format(self.roomName))
+
 
 class Item(object):
     """general item building class to set, edit, and return attributes
@@ -201,12 +229,22 @@ class Item(object):
     itemMaterial = wood, metal, electronic, breakable, meltable
     itemDescription = string
     """
-    def __init__(self, name, dmg, ability, material, desc):
+    def __init__(self, name, dmg, ability, material, desc,
+                 unlockKey, visible, uAbility, uNum, uText,
+                 uRm, crafted, useRooms):
         self.itemName = name
         self.itemDamage = dmg
         self.itemAbility = ability
         self.itemMaterial = material
         self.itemDescription = desc
+        self.itemUnlockKey = unlockKey
+        self.itemVisible = visible
+        self.itemUnlockAbility = uAbility
+        self.itemUnlockNum = uNum
+        self.itemUnlockText = uText
+        self.itemUnlockRm = uRm
+        self.itemCrafted = crafted
+        self.itemUseRooms = useRooms
 
     # returns for item
     def return_itemName(self):
@@ -223,6 +261,30 @@ class Item(object):
 
     def return_itemDescription(self):
         return self.itemDescription
+
+    def return_itemUnlockKey(self):
+        return self.itemUnlockKey
+
+    def return_itemVisible(self):
+        return self.itemVisible
+
+    def return_itemUnlockAbility(self):
+        return self.itemUnlockAbility
+
+    def return_itemUnlockNum(self):
+        return self.itemUnlockNum
+
+    def return_itemUnlockText(self):
+        return self.itemUnlockText
+
+    def return_itemUnlockRm(self):
+        return self.itemUnlockRm
+
+    def return_itemCrafted(self):
+        return self.itemCrafted
+
+    def return_itemUseRooms(self):
+        return self.itemUseRooms
 
     # setters for item
     def set_itemName(self, name):
@@ -257,6 +319,9 @@ class Book(Item):
     def return_writing(self, pageNO):
         return self.bookWriting[pageNO]
 
+    def return_book(self):
+        return self.bookWriting
+
 
 # scans for .txt files in given folder to auto-add items, npcs, and books
 def file_scan(folderName):  # "books", "npcs", "items"
@@ -268,9 +333,11 @@ def file_scan(folderName):  # "books", "npcs", "items"
     userItemList = []
     itemObjects = []
     itemTitles = []
+    itemRooms = []
     roomObjects = []
     roomTitles = []
     roomItemList = []
+    roomConnections = []
     roomNpcList = []
     userTitle = []
     userObject = []
@@ -283,8 +350,8 @@ def file_scan(folderName):  # "books", "npcs", "items"
             # print("This is printing {}".format(joinedFileName))
             # checks for new lines in .txt files located in books/
             if folderName is "books":
-                bookTitles.append(fileName)  # save file name as string list item
-                bookText = ["Click the next Arrow to turn the page"]
+                bookTitles.append(fileName.title())  # save file name as string list item
+                bookText = ["< Press enter/return to turn the page >"]
                 file = Book(bookText)
                 bookObjects.append(file)  # save file as object list
                 for line in f:
@@ -322,9 +389,45 @@ def file_scan(folderName):  # "books", "npcs", "items"
                         description = line.split(":")[1]
                         description = description.rstrip("\n")
                         itemBuildDesc = description
+                    if "Item Use Unlock" in line:
+                        unlock = line.split(":")[1]
+                        unlock = unlock.rstrip("\n")
+                        useUnlock = unlock
+                    if "Item Visible at Start" in line:
+                        visible = line.split(":")[1]
+                        visible = visible.rstrip("\n")
+                        visStart = visible
+                    if "Item Unlock Ability" in line:
+                        ability = line.split(":")[1]
+                        ability = ability.rstrip("\n")
+                        uAbility = ability
+                    if "Item Unlock Num Ability" in line:
+                        ability = line.split(":")[1]
+                        ability = ability.rstrip("\n")
+                        ability = int(ability)
+                        uNum = ability
+                    if "Item Unlock Text" in line:
+                        text = line.split(":")[1]
+                        text = text.rstrip("\n")
+                        uText = text
+                    if "Item Unlock Remove" in line:
+                        remove = line.split(":")[1]
+                        remove = remove.rstrip("\n")
+                        uRemove = remove
+                    if "Item Visible Item Crafted" in line:
+                        crafted = line.split(":")[1]
+                        crafted = crafted.rstrip("\n")
+                        uCrafted = crafted
+                    if "Item Use Rooms" in line:
+                        for i in range(13, len(document)):
+                            room = document[i].rstrip("\n")
+                            itemRooms.append(room)
                 itemName = Item(itemBuildFirstName, itemBuildDamage,
-                                itemBuildAbility, itemBuildMaterial, itemBuildDesc)
+                                itemBuildAbility, itemBuildMaterial, itemBuildDesc,
+                                useUnlock, visStart, uAbility, uNum, uText, uRemove,
+                                uCrafted, itemRooms)
                 itemObjects.append(itemName)  # append object to list for zipping
+                itemRooms = []
                 document = ""
                 f.close()
             elif folderName is "rooms":
@@ -333,17 +436,28 @@ def file_scan(folderName):  # "books", "npcs", "items"
                 document = f.readlines()
                 itemListLen = len(document)
                 for i in range(len(document)):
+                    if "Connecting Rooms" in document[i]:
+                        connectingStart = i + 1
                     if "Items in Room" in document[i]:
                         itemStart = i + 1
                     if "NPCs in room" in document[i]:
                         npcStart = i + 1
+                    if "Room Status" in document[i]:
+                        statusStart = i
+                for i in range(connectingStart, (statusStart)):
+                    connectRoomRange = document[i]
+                    connectRoomRange = connectRoomRange.rstrip("\n")
+                    connectRoomRange = connectRoomRange.title()
+                    roomConnections.append(connectRoomRange)
                 for i in range(itemStart, (npcStart-1)):
                     itemRoomRange = document[i]
                     itemRoomRange = itemRoomRange.rstrip("\n")
+                    itemRoomRange = itemRoomRange.title()
                     roomItemList.append(itemRoomRange)
                 for i in range(npcStart, (len(document))):
                     npcRoomRange = document[i]
                     npcRoomRange = npcRoomRange.rstrip("\n")
+                    npcRoomRange = npcRoomRange.title()
                     roomNpcList.append(npcRoomRange)
                 for line in document:
                     if "Room Name" in line:
@@ -362,20 +476,30 @@ def file_scan(folderName):  # "books", "npcs", "items"
                         floor = line.split(":")[1]
                         floor = floor.rstrip("\n")
                         roomBuildFloor = floor
-                    if "Connecting Rooms" in line:
-                        cRoom = line.split(":")[1]
-                        cRoom = cRoom.rstrip("\n")
-                        roomBuildcRooms = cRoom
                     if "Room Status" in line:
                         rStatus = line.split(":")[1]
                         rStatus = rStatus.rstrip("\n")
                         roomBuildStatus = rStatus
+                    if "Door Locked" in line:
+                        lStatus = line.split(":")[1]
+                        lStatus = lStatus.rstrip("\n")
+                        yes = ['Yes', 'yes']
+                        if lStatus in yes:
+                            roomBuildLocked = True
+                        else:
+                            roomBuildLocked = False
+                    if "Needed for unlock" in line:
+                        needed = line.split(":")[1]
+                        needed = needed.rstrip("\n")
+                        roomBuildKey = needed
                 roomName = Room(roomBuildName, roomBuildColor, roomBuildFeatures,
-                                roomBuildFloor, roomBuildcRooms, roomBuildStatus,
-                                roomItemList, roomNpcList)
+                                roomBuildFloor, roomConnections, roomBuildStatus,
+                                roomItemList, roomNpcList,
+                                roomBuildLocked, roomBuildKey)
                 roomObjects.append(roomName)  # append object to list for zipping
                 roomItemList = []
                 roomNpcList = []
+                roomConnections = []
                 document = ""
                 f.close()
             elif folderName is "npcs" or "user":
@@ -530,14 +654,12 @@ First book in object list, 3rd index (2nd line of txt)"""
 # print(books["book1"].return_writing(1))
 # print(books["The King Who Ruled the World"].return_writing(3))
 
-# scan through files
+# scan through files in directory to build
 rooms = file_scan("rooms")
 items = file_scan("items")
 npcs = file_scan("npcs")
 user = file_scan("user")
 books = file_scan("books")
-
-print(npcs['Henry'].return_inventory())
 
 
 # typing speed for 'print_slow'
@@ -577,16 +699,20 @@ def game_loop():
     use = ['use', 'u', '2']
     inspect = ['inspect', 'i', '3']
     inventory = ['inventory', 'inv', '4']
-    getMap = ['map', 'm', '5']
-    displayHelp = ['help', 'h', '6']
+    openDoor = ['door', 'doors', 'd', '5']
+    roomDescription = ['room', 'room description', 'r', '6']
+    getMap = ['map', 'm', '7']
+    displayHelp = ['help', 'h', '8']
 
     choicesMessage = """Current Options:
     Talk(t, 1) - interact with another character
     Use(u, 2) - use an item located in your inventory
     Inspect(i, 3) - interact with an item in the current room
     Inventory(inv, 4) - display items located in your inventory
-    Map(m, 5) - display the map
-    Help(h, 6) - show options"""
+    Door(d, 5) - open a door in the room
+    Room Description(r, 6) - get a description of the room
+    Map(m, 7) - display the map
+    Help(h, 8) - show options"""
 
     clear_terminal()
     print(choicesMessage)
@@ -617,15 +743,60 @@ def game_loop():
             clear_terminal()
             print_slow("Current Inventory Items:", standardSpeed, "noWrap")
             print(user["User"].return_inventory())
+            userChoice = input("Which item do you wish to use?: ")
+            userChoice = userChoice.title()
+            if userChoice in user["User"].return_inventory():
+                if valid(userChoice, "book") is True:
+                    read_book(userChoice)
+                elif valid(userChoice, "item") is True:
+                    print("It's AN ITEM!")
+                else:
+                    print("Error: Input not recognized as a valid item.")
+            else:
+                print("Input not recognized as a valid item. Please try again.")
         elif choice in inspect:
             clear_terminal()
-            print("user choice = inspect")
             print_slow("Items in {}:\n{}".format(userCurrent, rooms[userCurrent].return_roomItems()), standardSpeed, "wrap")
+            userChoice = input("Which item do you wish to inspect?: ")
+            userChoice = userChoice.title()
+            if userChoice in rooms[userCurrent].return_roomItems():
+                if valid(userChoice, "book") is True:
+                    read_book(userChoice)
+                elif valid(userChoice, "item") is True:
+                    print("It's AN ITEM!")
+                else:
+                    print("Error: Input not recognized as a valid item.")
+            else:
+                print("Input not recognized as a valid item. Please try again.")
         elif choice in inventory:
             clear_terminal()
             print_slow("Current Inventory Items:", standardSpeed, "noWrap")
             print(user["User"].return_inventory())
             print("\n\n")
+        elif choice in openDoor:
+            clear_terminal()
+            print_slow("Current Doors in {}: {}".format(userCurrent, rooms[userCurrent].return_roomConnections()), standardSpeed, "wrap")
+            doorChoice = input("Which door do you wish to open?: ")
+            doorChoice = doorChoice.title()
+            if valid(doorChoice.title(), "room") is True:
+                if rooms[doorChoice].return_isLocked() is False:
+                    change_room(doorChoice)
+                else:
+                    requiredItem = rooms[doorChoice].return_key()
+                    if requiredItem in user["User"].return_inventory():
+                        if yes_no("\nThe door to the {} is locked. Use {} to unlock it?: ".format(doorChoice, requiredItem)) is True:
+                            rooms[doorChoice].unlock_room()
+                            change_room(doorChoice)
+                        else:
+                            print_slow("Umm, alright. What are you saving that for? That's kind of why you should be carrying around that thing for...", standardSpeed, "wrap")
+                    else:
+                        print("It's locked, you need a key.")
+            else:
+                print("Door not recognized. Please try again.")
+        elif choice in roomDescription:
+            if valid(user["User"].return_currentroom(), "room") is True:
+                print("{}: ".format(userCurrent))
+                display_roomInfo(userCurrent)
         elif choice in getMap:
             clear_terminal()
             # save game map
@@ -641,6 +812,29 @@ def game_loop():
             print(choicesMessage)
         else:
             print("Error: command not recognized. Enter 'help' for more details.\n")
+
+
+# yes or no text input
+def yes_no(textToDisplay):
+    yes = ['yes', 'y']
+    no = ['no', 'n']
+    while True:
+        userChoice = input(textToDisplay)
+        userChoice = userChoice.lower()
+        if userChoice in yes:
+            return True
+        elif userChoice in no:
+            return False
+        else:
+            print("\nEnter 'y' for yes or 'n' for no")
+
+
+# prints out book line by line
+def read_book(selectBook):
+    for i in range(len(books[selectBook].return_book())):
+        clear_terminal()
+        print("{}: Page {} of {}\n".format(selectBook, i + 1, len(books[selectBook].return_book())))
+        input("{}\n".format(books[selectBook].return_writing(i)))
 
 
 def npc_loop(npc):
@@ -719,7 +913,7 @@ def print_slow(text, delay, inf):
         time.sleep(delay)
     print("")
 
-
+# VALIDITY CHECKING
 # checks validity on input with the dict keys from file input
 def valid(testItem, typeTest):
     # define list of valid definitions
@@ -740,52 +934,82 @@ def valid(testItem, typeTest):
         return True
     else:
         if typeTest is "room":
-            print("Error: Room is not valid")
             return False
         elif typeTest is "item":
-            print("Error: Item is not valid")
             return False
         elif typeTest is "npc":
-            print("Error: NPC is not valid")
             return False
         elif typeTest is "book":
-            print("Error: Book is not valid")
             return False
 
 
 # check if the items in list are built
 def check_lists(listToCheck):
     if listToCheck is "RoomNPCs":
-                pass
+        roomList = list(rooms.keys())
+        npcsToRemove = []
+        for room in roomList:
+            roomNPCs = rooms[room].return_npcPresent()
+            for npc in roomNPCs:
+                if valid(npc, "npc") is False:
+                    npcsToRemove.append(npc)
+            del_roomNPCs(room, npcsToRemove)
     elif listToCheck is "NPCitems":
-                pass
+        npcList = list(npcs.keys())
+        itemsToRemove = []
+        for npc in npcList:
+            npcItems = npcs[npc].return_inventory()
+            for item in npcItems:
+                if valid(item, "item") is True:
+                    pass
+                elif valid(item, "book") is True:
+                    pass
+                elif valid(item, "item") is False and valid(item, "book") is False:
+                    itemsToRemove.append(item)
+                else:
+                    print("Error: 'check_lists' Checking npcs items failed")
+            del_npcItems(npc, itemsToRemove)
     elif listToCheck is "RoomItems":
         roomList = list(rooms.keys())
+        itemsToRemove = []
         for room in roomList:
             roomItems = rooms[room].return_roomItems()
             for item in roomItems:
-                print("\n")
-                print(item)
                 if valid(item, "item") is True:
-                    print(room)
-                    print("Keep item")
-                    print(item)
+                    pass
                 elif valid(item, "book") is True:
-                    print(room)
-                    print("Keep book")
-                    print(item)
-                elif valid(item, "item") is False:
-                    if valid(item, "book") is False:
-                        print(room)
-                        print("Remove")
-                        print(item)
+                    pass
+                elif valid(item, "item") is False and valid(item, "book") is False:
+                    itemsToRemove.append(item)
                 else:
                     print("Error: 'check_lists' Checking room items failed")
-
-
+            del_roomItems(room, itemsToRemove)
     else:
         print("Error 'check_list' listToCheck not recognized")
 
+
+# delete room item passes from 'check_lists'
+def del_roomItems(room, itemList):
+    print("Warning: The following items are assigned to rooms, but don't have a .txt file in the 'items' folder:")
+    print("{}\n".format(itemList))
+    for item in itemList:
+        rooms[room].del_roomItem(item)
+
+
+# delete room npc passes from 'check_lists'
+def del_roomNPCs(room, npcList):
+    print("Warning: The following NPCs are assigned to rooms, but don't have a .txt file in the 'npcs' folder:")
+    print("{}\n".format(npcList))
+    for npc in npcList:
+        rooms[room].remove_npc(npc)
+
+# delete npc item passes from 'check_lists'
+def del_npcItems(npc, itemList):
+    print("Warning: The following items are assigned to NPCs, but don't have a .txt file in the 'items' folder:")
+    print("{}\n".format(itemList))
+    for item in itemList:
+        npcs[npc].del_npcItem(item)
+# END OF VALIDITY CHECKING
 
 # iterates through room item keys
 def room_itemKeys(room):
@@ -813,9 +1037,36 @@ def npc_changeroom(currentRoom, npc, newRoom):
             print("Successfully removed '{}', from {}.\nChanged to {}".format(npcName, currentRoom.roomName, newRoom.roomName))
 
 
-check_lists("RoomItems")
-welcome_message()
-game_loop()
+# for user
+# edits user's current room (walks through door)
+def change_room(newRoom):
+    if valid(newRoom, "room") is True:
+        user["User"].set_currentRoom(newRoom)
+        print("Entered the {}".format(newRoom))
+        display_roomInfo(newRoom)
+
+
+# prints a description of the room
+def display_roomInfo(room):
+    wallColor = rooms[room].return_wallColor()
+    floorDesc = rooms[room].return_floorDescription()
+    roomStatus = rooms[room].return_roomStatus()
+    doorNum = len(rooms[room].return_roomConnections())
+    uniqueFeature = rooms[room].return_uniqueFeatures()
+    if doorNum is 1:
+        thereIs = "There is"
+        door = "door"
+    else:
+        thereIs = "There are"
+        door = "doors"
+    print_slow("\nThe walls are {}, the floor is {}, and it's {}. {} {} {} in the room. {}".format(wallColor, floorDesc, roomStatus, thereIs, doorNum, door, uniqueFeature), standardSpeed, "wrap")
+
+
+check_lists("RoomItems")  # checks lists to actual txt build files
+check_lists("RoomNPCs")
+check_lists("NPCitems")
+welcome_message()  # displays welcome message
+game_loop()  # user input loops
 
 """ example and testing of adding people and rooms
 without a file to pull it from
