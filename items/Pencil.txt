@@ -1,8 +1,8 @@
-Item Name:Thor's Hammer
-Item Damage (0 - 100):100
+Item Name:Pencil
+Item Damage (0 - 100):5
 Item Ability (hack, attack, heal, cure, buff, nerf:attack
-Item Material (wood, metal, electronic, breakable, meltable):metal
-Item Description:It's seriously Thor's hammer. This thing is no joke.
+Item Material (wood, metal, electronic, breakable, meltable):wood
+Item Description:Mightier than the sword
 Item Use Unlock (Item that unlocks secret if used on):
 Item Visible at Start (false for crafted items):True
 Item Unlock Ability (hack, attack, heal, cure, buff, nerf):
@@ -14,6 +14,3 @@ Item Use Rooms (Rooms the item can be used in, enter in new lines):
 Testing
 Pencil testing
 Hello
-More stuff
-Additional stuff
-Don't mess with the pencil file
