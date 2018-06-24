@@ -1,16 +1,18 @@
 Room Name:Lab
 Wall color:White
-Unique Features:Nothing Special
+Unique Features:Everything looks so fancy and high-tech here.
 Floor Description:Squeaky clean
 Connecting Rooms (doors to):
+Kitchen
 Room Status:warm
+Door Locked:yes
+Needed for unlock:Thors Hammer
 Items in Room (use new lines for each item):
 Beaker
 Glass
 Explosives
 NPCs in room (use new lines for each NPC):
 Henry
-Peter
 Testing
 BLeh
 Hi
