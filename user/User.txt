@@ -11,3 +11,5 @@ Inventory (separate with lines):
 Pencil
 Calculator
 Backpack
+Thors Hammer
+book1
